@@ -1,0 +1,82 @@
+// Programa de exemplo da MiniLang
+// Arquivo utilizado para demonstrar o escopo lexico da linguagem
+
+int total = 007;
+int limite = 10;
+int contador1 = 0;
+int _incremento = 2;
+
+// Operadores aritmeticos
+total = total + 5;
+total = total - 3;
+total = total * 2;
+total = total / 2;
+
+// Estrutura de repeticao e operador menor
+while (contador1 < limite) {
+    contador1 = contador1 + 1;
+    print(contador1);
+}
+
+// Igualdade
+if (contador1 == limite) {
+    print(contador1);
+}
+
+// Diferenca
+if (total != limite) {
+    total = total + _incremento;
+}
+
+// Menor ou igual
+if (total <= 100) {
+    total = total * 2;
+}
+
+// Maior
+if (total > limite) {
+    total = total - 1;
+}
+
+// Maior ou igual e uso de else
+if (total >= 5) {
+    print(total);
+} else {
+    print(limite);
+}
+
+// Identificadores com digitos e underline
+int valor1 = 1;
+int valor2 = 2;
+int resultado_final = 0;
+
+resultado_final = valor1 + valor2;
+print(resultado_final);
+
+// Identificadores parecidos com palavras reservadas
+int intx = 1;
+int printx = 2;
+int ifx = 3;
+int elsex = 4;
+int while1 = 5;
+
+print(intx);
+print(printx);
+print(ifx);
+print(elsex);
+print(while1);
+
+// Maiusculas e minusculas representam identificadores diferentes
+int valor = 10;
+int Valor = 20;
+
+print(valor);
+print(Valor);
+
+// Zeros a esquerda sao permitidos
+int codigo = 00042;
+print(codigo);
+
+// Resultado final
+total = total + resultado_final;
+print(total);
