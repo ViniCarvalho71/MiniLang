@@ -23,7 +23,46 @@ class Lexer:
         return self.tokens, self.diagnostics
 
     def scan_token(self):
-        pass
+        c = self.advance()
+
+        if self.is_digit(c):
+            self.number()
+
+        elif c == "=":
+            if self.match("="):
+                self.add_token("EQUAL_EQUAL")
+            else:
+                self.add_token("ASSIGN")
+
+        elif c == "!":
+            if self.match("="):
+                self.add_token("BANG_EQUAL")
+            else:
+                self.report_invalid_character(c)
+
+        elif c == "<":
+            if self.match("="):
+                self.add_token("LESS_EQUAL")
+            else:
+                self.add_token("LESS")
+
+        elif c == ">":
+            if self.match("="):
+                self.add_token("GREATER_EQUAL")
+            else:
+                self.add_token("GREATER")
+
+        elif c == "+":
+            self.add_token("PLUS")
+
+        elif c == "-":
+            self.add_token("MINUS")
+
+        elif c == "*":
+            self.add_token("STAR")
+
+        elif c == "/":
+            self.add_token("SLASH")
 
     def at_end(self):
         return self.current >= len(self.source)
@@ -61,7 +100,6 @@ class Lexer:
             return True
         return False
         
-
     def add_token(self, type_):
         lexeme = self.source[self.start:self.current]
         self.tokens.append((type_, lexeme, self.start_line, self.start_column))
@@ -70,7 +108,13 @@ class Lexer:
         pass
 
     def number(self):
-        pass
+        while self.is_digit(self.peek()):
+            self.advance()
+
+        self.add_token("INT_LITERAL")
+
+    def is_digit(self, c):
+        return '0' <= c <= '9'
 
     def line_comment(self):
         pass
