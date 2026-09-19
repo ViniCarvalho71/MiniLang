@@ -23,7 +23,8 @@ MiniLang/
 │   └── lexer.py
 ├── tests/
 │   ├── __init__.py
-│   └── test_lexer.py
+│   ├── test_lexer.py
+│   └── test_processamento_simbolo_a_simbolo.py
 └── examples/
     └── programa.min
 ```
