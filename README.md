@@ -9,7 +9,7 @@ O analisador recebe o conteúdo completo de um arquivo-fonte, percorre a entrada
 * Nome: Mauricio Shiguemitsu Kamado Ikeda / RA: 199029
 * Nome: Paulo Henrique Almeida Veloso Leite / RA: 2008124
 * Nome: Vinícius de Andrade Costa / RA: 2002512
-* Nome: Vinícius Estevão Consolino Brandi / RA: 
+* Nome: Vinícius Estevão Consolino Brandi / RA: 2002558
 * Nome: Vinícius Carvalho da Silva / RA: 2002503
 
 ## Estrutura do projeto
