@@ -27,3 +27,25 @@ class AST:
                 return (aux - self.current) + res
             return aux - self.current
         return 0
+
+    def atribuicao(self) -> int:
+        aux = self.current
+
+        if self.token[aux] == 'IDENT':
+            aux += 1
+            if self.token[aux] == 'ASSIGN':
+                aux += 1
+                return aux
+        return 0
+
+    def declaracao(self) -> int:
+        aux = self.current
+
+        if self.token[aux] == 'KW_INT':
+            aux += 1
+            if self.token[aux] == 'IDENT':
+                aux += 1
+                if self.token[aux] == 'SEMICOLON':
+                    aux += 1
+                    return aux
+        return 0
