@@ -101,23 +101,29 @@ class Parser:
     
 
     def Atribuicao(self) -> int:
-        aux = self.current
+        atribuicao = Atribuicao()
 
-        if self.token[aux] == 'IDENT':
-            aux += 1
-            if self.token[aux] == 'ASSIGN':
-                aux += 1
-                return aux
-        return 0
+        if self.tokens[self.current][1] == 'IDENT':
+            atribuicao.variable = self.tokens[self.current][1]
+            self.current += 1
+            if self.tokens[self.current][1] == 'ASSIGN':
+                self.current += 1
+                atribuicao.expr = self.Expressao()
+                if self.tokens[self.current][1] == 'SEMICOLON':
+                    self.current += 1
+                    return atribuicao
+        return None
 
     def Declaracao(self) -> int:
-        aux = self.current
+        declaracao = Declaracao()
 
-        if self.token[aux] == 'KW_INT':
-            aux += 1
-            if self.token[aux] == 'IDENT':
-                aux += 1
-                if self.token[aux] == 'SEMICOLON':
-                    aux += 1
-                    return aux
-        return 0
+        if self.tokens[self.current][1] == 'KW_INT':
+            declaracao.type = self.tokens[self.current][1]
+            self.current += 1 
+            if self.tokens[self.current][1] == 'IDENT':
+                declaracao.ident = self.tokens[self.current][1]
+                self.current += 1 
+                if self.tokens[self.current][1] == 'SEMICOLON':
+                    self.current += 1 
+                    return declaracao
+        return None
