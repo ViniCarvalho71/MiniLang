@@ -100,30 +100,26 @@ class Parser:
         return None
     
 
-    def Atribuicao(self) -> int:
-        atribuicao = Atribuicao()
-
-        if self.tokens[self.current][1] == 'IDENT':
-            atribuicao.variable = self.tokens[self.current][1]
+    def Atribuicao(self) -> Atribuicao | None:
+        if self.tokens[self.current][0] == 'IDENT':
+            variavel = Variavel(self.tokens[self.current][1])
             self.current += 1
-            if self.tokens[self.current][1] == 'ASSIGN':
+            if self.tokens[self.current][0] == 'ASSIGN':
                 self.current += 1
-                atribuicao.expr = self.Expressao()
-                if self.tokens[self.current][1] == 'SEMICOLON':
+                expresao = self.Expressao()
+                if self.tokens[self.current][0] == 'SEMICOLON':
                     self.current += 1
-                    return atribuicao
+                    return Atribuicao(variavel, expresao)
         return None
 
-    def Declaracao(self) -> int:
-        declaracao = Declaracao()
-
-        if self.tokens[self.current][1] == 'KW_INT':
-            declaracao.type = self.tokens[self.current][1]
+    def Declaracao(self) -> Declaracao | None:
+        if self.tokens[self.current][0] == 'KW_INT':
+            tipo = self.tokens[self.current][1]
             self.current += 1 
-            if self.tokens[self.current][1] == 'IDENT':
-                declaracao.ident = self.tokens[self.current][1]
+            if self.tokens[self.current][0] == 'IDENT':
+                ident = self.tokens[self.current][1]
                 self.current += 1 
-                if self.tokens[self.current][1] == 'SEMICOLON':
+                if self.tokens[self.current][0] == 'SEMICOLON':
                     self.current += 1 
-                    return declaracao
+                    return Declaracao(tipo, ident)
         return None
