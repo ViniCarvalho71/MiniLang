@@ -1,6 +1,6 @@
-# MiniLang — Analisador Léxico
+# MiniLang — Analisadores Léxico e Sintático
 
-Projeto desenvolvido para implementação de um analisador léxico manual para a linguagem **MiniLang**.
+Projeto desenvolvido para implementação de um analisador léxico manual e de um parser descendente recursivo para a linguagem **MiniLang**, com visualização textual da Árvore Sintática Abstrata (AST).
 
 O analisador recebe o conteúdo completo de um arquivo-fonte, percorre a entrada da esquerda para a direita e produz os tokens reconhecidos e os diagnósticos encontrados durante a análise.
 
@@ -20,20 +20,28 @@ MiniLang/
 ├── main.py
 ├── minilang/
 │   ├── __init__.py
-│   └── lexer.py
+│   ├── lexer.py
+│   ├── ast.py
+│   └── visualizador.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_lexer.py
 │   └── test_processamento_simbolo_a_simbolo.py
 └── examples/
-    └── programa.min
+    ├── programa.min
+    ├── ast.min
+    └── erro_sintatico.min
 ```
 
 ### `main.py`
 
 Ponto de entrada do programa.
 
-É responsável por receber o caminho de um arquivo-fonte MiniLang, ler seu conteúdo e encaminhá-lo ao analisador léxico.
+É responsável por ler o arquivo-fonte, executar o lexer e o parser e exibir a AST. A opção `--somente-lexer` permite executar apenas a análise léxica.
+
+### `minilang/ast.py` e `minilang/visualizador.py`
+
+`ast.py` contém as classes dos nós e o parser. `visualizador.py` percorre os nós e formata a árvore com os operandos esquerdo e direito nessa ordem, sem executar as expressões.
 
 ### `minilang/lexer.py`
 
@@ -56,10 +64,53 @@ O programa contém exemplos das principais construções léxicas da linguagem e
 A partir da pasta raiz do projeto, execute:
 
 ```bash
-python main.py examples/programa.min
+python main.py examples/ast.min
 ```
 
-O `main.py` irá ler o conteúdo do arquivo informado e executar a análise léxica.
+O programa exibe os tokens, os diagnósticos e a AST. Requer Python 3.9 ou superior, sem dependências externas.
+
+Para executar somente o lexer com o exemplo original:
+
+```bash
+python main.py examples/programa.min --somente-lexer
+```
+
+Esse exemplo original inclui construções reconhecidas pelo lexer que estão fora do escopo do parser.
+
+## Exemplo de AST
+
+O arquivo `examples/ast.min` contém:
+
+```text
+int x;
+x = 2 + 3 * 4;
+print(x);
+```
+
+A árvore exibida é:
+
+```text
+Programa
+├── Declaracao(x)
+├── Atribuicao(x)
+│   └── Binaria(+)
+│       ├── Inteiro(2)
+│       └── Binaria(*)
+│           ├── Inteiro(3)
+│           └── Inteiro(4)
+└── Saida
+    └── Variavel(x)
+```
+
+A multiplicação fica no ramo direito da soma, preservando a precedência. Parênteses alteram o agrupamento; operações de mesma precedência associam à esquerda.
+
+Para demonstrar um erro sintático:
+
+```bash
+python main.py examples/erro_sintatico.min
+```
+
+O resultado inclui `Esperada uma expressão, encontrado RPAREN na linha 2, coluna 11`. O programa para no primeiro erro sintático e retorna código de saída 1. Erros léxicos também impedem a geração da AST.
 
 ## Testes
 
@@ -121,4 +172,4 @@ Ao final da entrada, o lexer produz um token `EOF`.
 
 ## Limitações conhecidas
 
-Nenhuma limitação conhecida no momento.
+O parser reconhece declarações `int x;`, atribuições, `print`, identificadores, inteiros e expressões com `+`, `-`, `*`, `/` e parênteses. Declarações com inicialização (`int x = 1;`), `if`, `else`, `while`, blocos, operadores relacionais e unários estão fora do escopo. O parser não verifica declarações de variáveis nem executa o programa.

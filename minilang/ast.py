@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class Inteiro:
     def __init__(self, value):
         self.value = value
@@ -7,7 +10,7 @@ class Variavel:
         self.value = value
 
 class Binaria:
-    def __init__(self, operator, right, left):
+    def __init__(self, operator, left, right):
         self.operator = operator
         self.right = right
         self.left = left
