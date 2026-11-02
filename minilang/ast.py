@@ -27,6 +27,9 @@ class Print:
         self.command = command
         self.expr = expr
 
+class Programa:
+    def __init__(self, itens):
+        self.itens = itens
 
 
 
@@ -34,15 +37,28 @@ class Parser:
 
     def __init__(self, tokens, start, current):
         self.tokens = tokens #cada token é (nome, valor, linha, coluna)
+        # self.tokens = ["KW_PRINT", "LPAREN", "IDENT", "RPAREN", "SEMICOLON", ""]
         self.start = start
         self.current = current
 
+
+    def Esperado(self, esperado):
+        token = self.tokens[self.current]
+
+        if token[0] == esperado:
+            self.current += 1
+            return token
+        raise SyntaxError(
+            f"Esperado {esperado}, encontrado {token[0]} "
+            f"na linha {token[2]}, coluna {token[3]}"
+        
+        )
     # Expr → Termo PLUS Expr
     # | Termo MINUS Expr
     # | Termo
     # Termo → IDENT | INT_LITERAL
     def Expressao(self):
-        esquerda = self.termo()  
+        esquerda = self.Termo()  
         if esquerda is None:
             return None
             
@@ -51,7 +67,7 @@ class Parser:
             operador = op_token[1]
             self.current += 1 
             
-            direita = self.termo()  
+            direita = self.Termo()  
             if direita is None:
                 return None  
                 
@@ -98,28 +114,72 @@ class Parser:
             
             return None
         return None
+
+
+    def Atribuicao(self) -> Atribuicao:
+        ident = self.Esperado("IDENT")
+        variavel = Variavel(ident[1])
+
+        self.Esperado("ASSIGN")
+
+        expressao = self.Expressao()
+        if expressao is None:
+            token = self.tokens[self.current]
+            raise SyntaxError(
+                f"Esperada uma expressão, encontrado {token[0]} "
+                f"na linha {token[2]}, coluna {token[3]}"
+            )
+
+        self.Esperado("SEMICOLON")
+
+        return Atribuicao(variavel, expressao)
+
+    def Declaracao(self) -> Declaracao:
+        tipo = self.Esperado("KW_INT")
+        ident = self.Esperado("IDENT")
+        self.Esperado("SEMICOLON")
+        return Declaracao(tipo[1], ident[1])
+
+    def Saida(self) -> Print:
+        token = self.Esperado("KW_PRINT")
+        self.Esperado("LPAREN")
+        expr = self.Expressao()
+        if expr is None:
+            atual = self.tokens[self.current]
+            raise SyntaxError(
+                f"Esperada uma expressão, encontrado {atual[0]} "
+                f"na linha {atual[2]}, coluna {atual[3]}"
+            )
+
+        self.Esperado("RPAREN")
+        self.Esperado("SEMICOLON")
+        return Print(token[1], expr)
+
+
+
+    def Item(self) -> Declaracao | Atribuicao | Print:
+        token = self.tokens[self.current]
+        tipo = token[0]
+        if tipo == "KW_INT":
+            return self.Declaracao()
+        elif tipo == "IDENT":
+            return self.Atribuicao()
+        elif tipo == "KW_PRINT":
+            return self.Saida()
+        raise SyntaxError(
+            f"Comando inesperado: {token[0]} "
+            f"na linha {token[2]}, coluna {token[3]}"
+        )
+
+    def ListaItens(self) -> list[Declaracao | Atribuicao | Print]:
+        itens = []
+        while self.tokens[self.current][0] != "EOF":
+            itens.append(self.Item())
+
+        return itens
     
+    def Programa(self) -> Programa:
+        itens = self.ListaItens()
+        self.Esperado("EOF")
 
-    def Atribuicao(self) -> Atribuicao | None:
-        if self.tokens[self.current][0] == 'IDENT':
-            variavel = Variavel(self.tokens[self.current][1])
-            self.current += 1
-            if self.tokens[self.current][0] == 'ASSIGN':
-                self.current += 1
-                expresao = self.Expressao()
-                if self.tokens[self.current][0] == 'SEMICOLON':
-                    self.current += 1
-                    return Atribuicao(variavel, expresao)
-        return None
-
-    def Declaracao(self) -> Declaracao | None:
-        if self.tokens[self.current][0] == 'KW_INT':
-            tipo = self.tokens[self.current][1]
-            self.current += 1 
-            if self.tokens[self.current][0] == 'IDENT':
-                ident = self.tokens[self.current][1]
-                self.current += 1 
-                if self.tokens[self.current][0] == 'SEMICOLON':
-                    self.current += 1 
-                    return Declaracao(tipo, ident)
-        return None
+        return Programa(itens)
