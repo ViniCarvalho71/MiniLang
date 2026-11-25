@@ -24,6 +24,7 @@ class TesteMain(unittest.TestCase):
         self.assertIn("AST:\nPrograma\n", resultado.stdout)
         self.assertIn("Declaracao(x)", resultado.stdout)
         self.assertIn("Binaria(*)", resultado.stdout)
+        
 
     def test_exemplo_invalido_mostra_diagnostico(self):
         resultado = self.executar("examples/erro_sintatico.min")

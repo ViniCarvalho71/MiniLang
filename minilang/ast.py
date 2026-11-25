@@ -30,6 +30,11 @@ class Print:
         self.command = command
         self.expr = expr
 
+class Bloco:
+    def __init__(self, itens):
+        self.itens = itens
+
+
 class Programa:
     def __init__(self, itens):
         self.itens = itens
@@ -118,6 +123,9 @@ class Parser:
             return None
         return None
 
+    def Condicao(self):
+        self.Esperado("KW_IF")
+
 
     def Atribuicao(self) -> Atribuicao:
         ident = self.Esperado("IDENT")
@@ -160,7 +168,7 @@ class Parser:
 
 
 
-    def Item(self) -> Declaracao | Atribuicao | Print:
+    def Item(self) -> Declaracao | Atribuicao | Print | Bloco:
         token = self.tokens[self.current]
         tipo = token[0]
         if tipo == "KW_INT":
@@ -169,17 +177,26 @@ class Parser:
             return self.Atribuicao()
         elif tipo == "KW_PRINT":
             return self.Saida()
+        elif tipo == "LBRACE":
+            return self.Escopo()
+        
         raise SyntaxError(
             f"Comando inesperado: {token[0]} "
             f"na linha {token[2]}, coluna {token[3]}"
         )
 
-    def ListaItens(self) -> list[Declaracao | Atribuicao | Print]:
+    def ListaItens(self, fim:str="EOF") -> list[Declaracao | Atribuicao | Print | Bloco]:
         itens = []
-        while self.tokens[self.current][0] != "EOF":
+        while self.tokens[self.current][0] not in (fim, "EOF"):
             itens.append(self.Item())
 
         return itens
+    
+    def Escopo(self) -> Bloco:
+        self.Esperado("LBRACE")
+        itens = self.ListaItens("RBRACE")
+        self.Esperado("RBRACE")
+        return Bloco(itens)
     
     def Programa(self) -> Programa:
         itens = self.ListaItens()
