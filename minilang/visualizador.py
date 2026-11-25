@@ -1,5 +1,5 @@
 from minilang.ast import (
-    Programa, Declaracao, Atribuicao, Print, Binaria, Inteiro, Variavel,
+    Programa, Declaracao, Atribuicao, Print, Binaria, Inteiro, Variavel, Bloco
 )
 
 
@@ -19,7 +19,10 @@ def descrever(no):
         return f"Inteiro({no.value})", []
     if isinstance(no, Variavel):
         return f"Variavel({no.value})", []
+    if isinstance(no, Bloco):
+        return f"Bloco", no.itens
     raise TypeError(f"No de AST desconhecido: {type(no).__name__}")
+
 
 
 def formatar_ast(raiz):
