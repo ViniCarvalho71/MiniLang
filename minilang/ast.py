@@ -9,6 +9,10 @@ class Variavel:
     def __init__(self, value):
         self.value = value
 
+class Booleano:
+    def __init__(self, value:bool):
+        self.value = value
+
 class Binaria:
     def __init__(self, operator, left, right):
         self.operator = operator
@@ -34,7 +38,16 @@ class Bloco:
     def __init__(self, itens):
         self.itens = itens
 
+class Condicional:
+    def __init__(self, condition, if_block, else_block):
+        self.condition = condition
+        self._if = if_block
+        self.else_block = else_block
 
+class Enquanto:
+    def __init__(self, condition, block):
+        self.condition = condition
+        self.block = block
 class Programa:
     def __init__(self, itens):
         self.itens = itens
@@ -70,7 +83,7 @@ class Parser:
         if esquerda is None:
             return None
             
-        while self.current < len(self.tokens) and self.tokens[self.current][0] in ("PLUS", "MINUS"):
+        while self.current < len(self.tokens) and self.tokens[self.current][0] in ("PLUS", "MINUS", "EQUAL_EQUAL", "BANG_EQUAL", "LESS_EQUAL", "LESS", "GREATER_EQUAL", "GREATER"):
             op_token = self.tokens[self.current]
             operador = op_token[1]
             self.current += 1 
@@ -110,7 +123,9 @@ class Parser:
             int_name = self.tokens[self.current][1]
             self.current += 1
             return Inteiro(int_name)
-
+        elif (self.current < len(self.tokens) and self.tokens[self.current][0] == "BOOL_LITERAL"):
+            token = self.Esperado("BOOL_LITERAL")
+            return Booleano(token[1] == "true")
         if self.current < len(self.tokens) and self.tokens[self.current][0] == "LPAREN":
             self.current += 1 
             expr = self.Expressao()  
@@ -122,10 +137,6 @@ class Parser:
             
             return None
         return None
-
-    def Condicao(self):
-        self.Esperado("KW_IF")
-
 
     def Atribuicao(self) -> Atribuicao:
         ident = self.Esperado("IDENT")
@@ -179,7 +190,10 @@ class Parser:
             return self.Saida()
         elif tipo == "LBRACE":
             return self.Escopo()
-        
+        elif tipo == "KW_IF":
+            return self.Se()
+        elif tipo == "KW_WHILE":
+            return self.Enquanto()
         raise SyntaxError(
             f"Comando inesperado: {token[0]} "
             f"na linha {token[2]}, coluna {token[3]}"
@@ -197,6 +211,32 @@ class Parser:
         itens = self.ListaItens("RBRACE")
         self.Esperado("RBRACE")
         return Bloco(itens)
+
+    def Se(self) -> Condicional:
+        self.Esperado("KW_IF")
+        self.Esperado("LPAREN")
+        condicao = self.Expressao()
+        self.Esperado("RPAREN")
+        
+        entao = self.Escopo()
+
+        senao = None
+
+        if self.tokens[self.current][0] == "KW_ELSE":
+            self.Esperado("KW_ELSE")
+            senao = self.Escopo
+
+        return Condicional(condicao, entao, senao)
+
+    def Enquanto(self) -> Enquanto:
+        self.Esperado("KW_WHILE")
+        self.Esperado("LPAREN")
+        condicao = self.Expressao()
+        self.Esperado("RPAREN")
+        bloco = self.Escopo()
+
+        return Enquanto(condicao, bloco)
+
     
     def Programa(self) -> Programa:
         itens = self.ListaItens()

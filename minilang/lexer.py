@@ -7,6 +7,8 @@ class Lexer:
         "if": "KW_IF",
         "else": "KW_ELSE",
         "while": "KW_WHILE",
+        "true": "BOOL_LITERAL",
+        "false": "BOOL_LITERAL",
     }
 
     def __init__(self, source, start, current, line, column, start_line, start_column, diagnostics):
