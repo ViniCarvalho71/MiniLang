@@ -1,3 +1,5 @@
+import json
+
 from minilang import ast
 
 
@@ -177,7 +179,17 @@ class GeradorBytecode:
             "mapa_origem": mapa_final,
         }
 
-    def verifica_saltos(self): 
+    def salva_bytecode(self, caminho="programa.bc"):
+        artefato = self.monta_artefato()
+        if artefato is None:
+            return False
+
+        with open(caminho, "w", encoding="utf-8") as arquivo:
+            json.dump(artefato, arquivo, indent=2)
+            arquivo.write("\n")
+        return True
+
+    def verifica_saltos(self):
         if self.rotulo_duplicado:
             return False
         for _, rotulo in self.saltos.values():
